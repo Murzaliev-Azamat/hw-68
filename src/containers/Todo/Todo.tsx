@@ -4,12 +4,14 @@ import {useDispatch, useSelector} from "react-redux";
 import {addTask, deleteTask, fetchTasks} from "./TodoSlice";
 import {AppDispatch, RootState} from "../../app/store";
 import Spinner from "../../components/Spinner/Spinner";
+import ButtonSpinner from "../../components/Spinner/ButtonSpinner";
 
 
 const Todo = () => {
   const dispatch: AppDispatch = useDispatch();
   const tasks = useSelector((state: RootState) => state.todo.tasks);
   const loading = useSelector((state: RootState) => state.todo.loading);
+  const addLoading = useSelector((state: RootState) => state.todo.addLoading);
   const [taskTitle, setTaskTitle] = useState<string>('');
 
   const onTextFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +39,7 @@ const Todo = () => {
     <div>
       <form onSubmit={onFormSubmit} className="input-group mt-2">
       <input onChange={onTextFieldChange} value={taskTitle} type="text" className="form-control" placeholder="Введите заголовок"/>
-      <button className="btn btn-primary">Add task</button>
+        <button className="btn btn-primary">{addLoading && <ButtonSpinner/>} Add task</button>
       </form>
       {loading ? <Spinner/> : tasks.map((task) => (
         <Task id={task.id} key={task.id} title={task.title} status={task.status} onDelete={removeTask}/>
