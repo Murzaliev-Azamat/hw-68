@@ -35,6 +35,11 @@ const Todo = () => {
     await dispatch(fetchTasks());
   }
 
+  // const updateTask = async (id: string) => {
+  //   await dispatch(updateTask(id));
+  //   await dispatch(fetchTasks());
+  // }
+
   return (
     <div>
       <form onSubmit={onFormSubmit} className="input-group mt-2">

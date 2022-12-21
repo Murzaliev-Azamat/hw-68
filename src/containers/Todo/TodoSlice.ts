@@ -1,6 +1,7 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {TaskProps, TasksApiList} from "../../types";
 import axiosApi from "../../axiosApi";
+import {RootState} from "../../app/store";
 
 
 interface TodoState {
@@ -50,13 +51,19 @@ export const deleteTask = createAsyncThunk<void, string>(
   }
 );
 
-// export const isDoneTask = createAsyncThunk<void, boolean, { state: TaskProps }>(
-//   'todo/isDone',
-//   async (id, thunkAPI) => {
-//     const status = thunkAPI.getState().status;
-//     await axiosApi.put("/tasks/" + id + '.json', status === true);
-//   }
-// );
+export const isDoneTask = createAsyncThunk<TaskProps[], string, { state: RootState }>(
+  'todo/isDone',
+  async (id, thunkAPI) => {
+    const tasks = thunkAPI.getState().todo.tasks;
+    const indexTask = tasks.findIndex(task => task.id === id)
+    if (indexTask !== -1) {
+      const status = thunkAPI.getState().todo.tasks[indexTask].status;
+      const title = thunkAPI.getState().todo.tasks[indexTask].title;
+      await axiosApi.put("/tasks/" + id + '.json', {title: title, status: !status});
+    }
+    return tasks;
+  }
+);
 
 export const TodoSlice = createSlice({
   name: 'todo',
@@ -85,6 +92,9 @@ export const TodoSlice = createSlice({
     builder.addCase(addTask.rejected, (state) => {
       state.addLoading = false;
       state.error = true;
+    });
+    builder.addCase(isDoneTask.fulfilled, (state, action) => {
+      state.tasks = action.payload;
     });
   }
 });
